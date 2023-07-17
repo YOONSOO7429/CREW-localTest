@@ -1,7 +1,7 @@
 const express = require("express");
 const authJwt = require("../middlewares/authMiddleware"); // Crew 회원 확인
 const { Users, Reports } = require("../models");
-const router = require("./boats");
+const router = express.Router();
 
 /* 1. 신고 접수 API
      @ 토큰을 검사하여, 유효한 토큰일 경우에만 신고
