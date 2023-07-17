@@ -14,6 +14,17 @@ module.exports = (sequelize, DataTypes) => {
         foreignKey: "userId",
         onDelete: "CASCADE",
       });
+
+      this.belongsTo(models.Boats, {
+        targetKey: "boatId",
+        foreignKey: "boatId",
+        onDelete: "CASCADE",
+      });
+
+      this.belongsTo(models.Comments, {
+        targetKey: "commetId",
+        foreignKey: "commetId",
+      });
     }
   }
   Reports.init(
@@ -33,6 +44,20 @@ module.exports = (sequelize, DataTypes) => {
         },
         onDelete: "CASCADE",
       },
+      boatId: {
+        type: DataTypes.INTEGER,
+        references: {
+          model: "Boats",
+          key: "boatId",
+        },
+      },
+      commentId: {
+        type: DataTypes.INTEGER,
+        references: {
+          model: "Comments",
+          key: "commetId",
+        },
+      },
       reportContent: {
         allowNull: false,
         type: DataTypes.STRING,
@@ -42,15 +67,12 @@ module.exports = (sequelize, DataTypes) => {
         type: DataTypes.DATE,
         defaultValue: DataTypes.NOW,
       },
-      updatedAt: {
-        allowNull: false,
-        type: DataTypes.DATE,
-        defaultValue: DataTypes.NOW,
-      },
     },
     {
       sequelize,
       modelName: "Reports",
+      timestamps: true,
+      updatedAt: false,
     }
   );
   return Reports;
