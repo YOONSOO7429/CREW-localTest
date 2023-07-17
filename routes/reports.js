@@ -1,15 +1,12 @@
 const express = require("express");
-const authJwt = require("../middlewares/authMiddleware"); // Crew 회원 확인
-const { Users, Reports } = require("../models");
+const { Reports } = require("../models");
 const router = express.Router();
 
 /* 1. 신고 접수 API
      @ 토큰을 검사하여, 유효한 토큰일 경우에만 신고
      @ reportContent */
-router.post("/report/:boatId", authJwt, async (req, res) => {
+router.post("/report/:boatId", async (req, res) => {
   try {
-    // user 정보
-    const { userId } = res.locals.user;
     // params
     const { boatId } = req.params;
     // req.body로 작성 내용 받기
@@ -37,10 +34,8 @@ router.post("/report/:boatId", authJwt, async (req, res) => {
   }
 });
 
-router.post("/report/:boatId/:commentId", authJwt, async (req, res) => {
+router.post("/report/:boatId/:commentId", async (req, res) => {
   try {
-    // user 정보
-    const { userId } = res.locals.user;
     // params
     const { boatId, commentId } = req.params;
     // body

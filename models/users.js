@@ -23,11 +23,6 @@ module.exports = (sequelize, DataTypes) => {
         sourceKey: "userId",
         foreignKey: "userId",
       });
-
-      this.hasMany(models.Reports, {
-        sourceKey: "userId",
-        foreignKey: "userId",
-      });
     }
   }
   Users.init(
