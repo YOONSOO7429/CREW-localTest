@@ -19,22 +19,15 @@ module.exports = {
         onDelete: "CASCADE",
       },
       boatId: {
+        allowNull: false,
         type: Sequelize.INTEGER,
-        references: {
-          model: "Boats",
-          key: "boatId",
-        },
       },
       commentId: {
         type: Sequelize.INTEGER,
-        references: {
-          model: "Comments",
-          key: "commetId",
-        },
       },
       reportContent: {
         allowNull: false,
-        type: Sequelize.STRING,
+        type: Sequelize.TEXT("medium"),
       },
       createdAt: {
         allowNull: false,

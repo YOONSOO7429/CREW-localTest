@@ -18,12 +18,11 @@ module.exports = (sequelize, DataTypes) => {
       this.belongsTo(models.Boats, {
         targetKey: "boatId",
         foreignKey: "boatId",
-        onDelete: "CASCADE",
       });
 
       this.belongsTo(models.Comments, {
-        targetKey: "commetId",
-        foreignKey: "commetId",
+        targetKey: "commentId",
+        foreignKey: "commentId",
       });
     }
   }
@@ -45,22 +44,15 @@ module.exports = (sequelize, DataTypes) => {
         onDelete: "CASCADE",
       },
       boatId: {
+        allowNull: false,
         type: DataTypes.INTEGER,
-        references: {
-          model: "Boats",
-          key: "boatId",
-        },
       },
       commentId: {
         type: DataTypes.INTEGER,
-        references: {
-          model: "Comments",
-          key: "commetId",
-        },
       },
       reportContent: {
         allowNull: false,
-        type: DataTypes.STRING,
+        type: DataTypes.TEXT("medium"),
       },
       createdAt: {
         allowNull: false,

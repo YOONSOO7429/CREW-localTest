@@ -20,6 +20,11 @@ module.exports = (sequelize, DataTypes) => {
         foreignKey: "boatId",
         onDelete: "CASCADE",
       });
+
+      this.hasMany(models.Reports, {
+        targetKey: "commentId",
+        foreignKey: "commentId",
+      });
     }
   }
   Comments.init(
