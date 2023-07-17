@@ -65,4 +65,51 @@ router.get("/mypage", authJwt, async (req, res) => {
   }
 });
 
+/* mypage 수정 이미지와 닉네임 수정 가능*/
+router.put("/mypage/edit", authJwt, async (req, res) => {
+  try {
+    // user 정보
+    const { userId } = res.locals.user;
+    const user = await Users.findOne({ where: userId });
+
+    // body로 정보 입력
+    const { nickName } = req.body;
+
+    // 수정 검사
+    if (nickName < 1) {
+      return res
+        .status(412)
+        .json({ errorMessage: "유효하지 않은 nickName입니다." });
+    }
+
+    // 수정할 내용에 따라 수정
+    if (user.nickName !== nickName) {
+      user.nickName = nickName;
+    }
+
+    // 수정할 부분이 없을 경우 / 수정할 내용이 있다면 해당 부분만 수정
+    if (!nickName) {
+      return res.status(412).json({ errorMessage: "수정할 내용이 없습니다." });
+    }
+
+    // update
+    const updateCount = await user.save();
+
+    // 수정 검사
+    if (updateCount < 1) {
+      return res.status(404).json({
+        errorMessage: "mypage 수정이 정상적으로 수정되지 않았습니다.",
+      });
+    }
+
+    // 수정 완료
+    return res.status(200).json({ message: "mypage 수정 완료." });
+  } catch (e) {
+    console.log(e);
+    return res
+      .status(400)
+      .json({ errorMessage: "mypage 수정 실패. 요청이 올바르지 않습니다." });
+  }
+});
+
 module.exports = router;
