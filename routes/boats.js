@@ -211,7 +211,7 @@ router.get("/boat/:boatId", loginMiddleware, async (req, res) => {
       return res.status(404).json({ errorMessage: "글이 존재하지 않습니다." });
     }
 
-    // // 글에 해당하는 댓글 조회
+    // 글에 해당하는 댓글 조회
     const comments = await Comments.findAll({
       attributes: [
         "commentId",

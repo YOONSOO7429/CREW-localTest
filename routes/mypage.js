@@ -1,5 +1,7 @@
 const express = require("express");
 const router = express.Router();
+const multer = require("multer");
+const path = require("path");
 const authJwt = require("../middlewares/authMiddleware");
 const { Users, Boats, Crews } = require("../models");
 
@@ -65,7 +67,7 @@ router.get("/mypage", authJwt, async (req, res) => {
   }
 });
 
-/* mypage 수정 이미지와 닉네임 수정 가능*/
+/* mypage 수정 이미지와 닉네임 수정*/
 router.put("/mypage/edit", authJwt, async (req, res) => {
   try {
     // user 정보

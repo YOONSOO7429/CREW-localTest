@@ -1,7 +1,50 @@
 const express = require("express");
 const router = express.Router();
-const { Crews, Comments, Boats } = require("../models");
+const { Crews, Comments, Boats, sequelize } = require("../models");
 const authJwt = require("../middlewares/authMiddleware");
+const loginMiddleware = require("../middlewares/loginMiddleware");
+
+/* 0. 댓글 목록 조회
+    @ 토큰 검사
+    @ 시간 순서에 맞춰 comment 조회 */
+router.get("/boat/:boatId/comment", async (req, res) => {
+  try {
+    // params
+    const { boatId } = req.params;
+
+    // 글에 해당하는 댓글 조회
+    const comments = await Comments.findAll({
+      attributes: [
+        "commentId",
+        "userId",
+        [sequelize.col("nickName"), "nickName"],
+        "comment",
+        "createdAt",
+      ],
+      where: { boatId, deletedAt: null },
+      include: [
+        {
+          model: Users,
+          attributes: [],
+        },
+      ],
+      raw: true,
+    });
+
+    // 조회된게 없을 경우
+    if (!comments) {
+      return res.status(202).json({ comments: [] });
+    }
+
+    // 조회된 결과
+    return res.status(200).json({ comments });
+  } catch (e) {
+    console.log(e);
+    return res
+      .status(400)
+      .json({ errorMessage: "댓글 목록 조회 실패. 요청이 올바르지 않습니다." });
+  }
+});
 
 /* 1. 댓글 작성
      @ 토큰을 검사하여 접근 권한이 있는지 확인
