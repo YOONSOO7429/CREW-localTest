@@ -68,8 +68,5 @@ module.exports = (io) => {
         console.log(e);
       }
     });
-    socket.on("disconnect", async () => {
-      console.log("사용자가 연결을 종료했습니다.");
-    });
   });
 };
