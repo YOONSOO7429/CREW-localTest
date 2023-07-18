@@ -21,7 +21,6 @@ router.post("/report/:boatId", async (req, res) => {
 
     // report 작성
     await Reports.create({
-      userId,
       boatId,
       reportContent,
     });
@@ -50,7 +49,6 @@ router.post("/report/:boatId/:commentId", async (req, res) => {
 
     // report 작성
     await Reports.create({
-      userId,
       boatId,
       commentId,
       reportContent,
