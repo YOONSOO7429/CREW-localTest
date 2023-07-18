@@ -27,8 +27,7 @@ const upload = multer({
     acl: "public-read",
     bucket: process.env.AWS_BUCKET,
     key: (req, file, callback) => {
-      const fileName = file.originalname;
-      callback(null, fileName);
+      callback(null, file.originalname);
     },
     // 용량 제한
     limits: { fileSize: 5 * 1024 * 1024 },
@@ -100,8 +99,8 @@ router.get("/mypage", authJwt, async (req, res) => {
 /* mypage 수정 이미지와 닉네임 수정*/
 router.put(
   "/mypage/edit",
-  authJwt,
   upload.single("image"),
+  authJwt,
   async (req, res) => {
     try {
       // user 정보
@@ -112,7 +111,7 @@ router.put(
       const { nickName } = req.body;
       // image
       const image = req.files;
-      console.log("image :", image);
+      console.log("image :", req.files);
 
       // 수정 검사
       if (nickName < 1) {
