@@ -1,38 +1,36 @@
 const express = require("express");
 const router = express.Router();
-const multer = require("multer");
-const multerS3 = require("multer-s3");
-const path = require("path");
-const AWS = require("aws-sdk");
-const fs = require("fs");
+// const multer = require("multer");
+// const multerS3 = require("multer-s3");
+// const AWS = require("aws-sdk");
 const authJwt = require("../middlewares/authMiddleware");
 const { Users, Boats, Crews } = require("../models");
 
 // s3 설정
 require("dotenv").config();
 
-AWS.config.update({
-  region: process.env.AWS_REGION,
-  accessKeyId: process.env.AWS_ACCESS_KEY_ID,
-  secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
-});
+// AWS.config.update({
+//   region: process.env.AWS_REGION,
+//   accessKeyId: process.env.AWS_ACCESS_KEY_ID,
+//   secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
+// });
 
-const s3 = new AWS.S3();
+// const s3 = new AWS.S3();
 
 // multer 설정
-const upload = multer({
-  storage: multerS3({
-    s3: s3,
-    contentType: multerS3.AUTO_CONTENT_TYPE,
-    acl: "public-read",
-    bucket: process.env.AWS_BUCKET,
-    key: (req, file, callback) => {
-      callback(null, file.originalname);
-    },
-    // 용량 제한
-    limits: { fileSize: 5 * 1024 * 1024 },
-  }),
-});
+// const upload = multer({
+//   storage: multerS3({
+//     s3: s3,
+//     contentType: multerS3.AUTO_CONTENT_TYPE,
+//     acl: "public-read",
+//     bucket: process.env.AWS_BUCKET,
+//     key: (req, file, callback) => {
+//       callback(null, file.originalname);
+//     },
+//     // 용량 제한
+//     limits: { fileSize: 5 * 1024 * 1024 },
+//   }),
+// });
 
 /* mypage API
 토큰을 검사하여 userId에 맞게 모집 글, 참여 글 불러오기 */
@@ -99,7 +97,7 @@ router.get("/mypage", authJwt, async (req, res) => {
 /* mypage 수정 이미지와 닉네임 수정*/
 router.put(
   "/mypage/edit",
-  upload.single("image"),
+  // upload.single("image"),
   authJwt,
   async (req, res) => {
     try {
