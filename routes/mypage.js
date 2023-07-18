@@ -1,9 +1,39 @@
 const express = require("express");
 const router = express.Router();
 const multer = require("multer");
+const multerS3 = require("multer-s3");
 const path = require("path");
+const AWS = require("aws-sdk");
+const fs = require("fs");
 const authJwt = require("../middlewares/authMiddleware");
 const { Users, Boats, Crews } = require("../models");
+
+// s3 설정
+require("dotenv").config();
+
+AWS.config.update({
+  region: process.env.AWS_REGION,
+  accessKeyId: process.env.AWS_ACCESS_KEY_ID,
+  secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
+});
+
+const s3 = new AWS.S3();
+
+// multer 설정
+const upload = multer({
+  storage: multerS3({
+    s3: s3,
+    contentType: multerS3.AUTO_CONTENT_TYPE,
+    acl: "public-read",
+    bucket: process.env.AWS_BUCKET,
+    key: (req, file, callback) => {
+      const fileName = file.originalname;
+      callback(null, fileName);
+    },
+    // 용량 제한
+    limits: { fileSize: 5 * 1024 * 1024 },
+  }),
+});
 
 /* mypage API
 토큰을 검사하여 userId에 맞게 모집 글, 참여 글 불러오기 */
@@ -68,50 +98,63 @@ router.get("/mypage", authJwt, async (req, res) => {
 });
 
 /* mypage 수정 이미지와 닉네임 수정*/
-router.put("/mypage/edit", authJwt, async (req, res) => {
-  try {
-    // user 정보
-    const { userId } = res.locals.user;
-    const user = await Users.findOne({ where: userId });
+router.put(
+  "/mypage/edit",
+  authJwt,
+  upload.single("image"),
+  async (req, res) => {
+    try {
+      // user 정보
+      const { userId } = res.locals.user;
+      const user = await Users.findOne({ where: userId });
 
-    // body로 정보 입력
-    const { nickName } = req.body;
+      // body로 정보 입력
+      const { nickName } = req.body;
+      // image
+      const image = req.files;
+      console.log("image :", image);
 
-    // 수정 검사
-    if (nickName < 1) {
+      // 수정 검사
+      if (nickName < 1) {
+        return res
+          .status(412)
+          .json({ errorMessage: "유효하지 않은 nickName입니다." });
+      }
+
+      // 수정할 내용에 따라 수정
+      if (user.nickName !== nickName) {
+        user.nickName = nickName;
+      }
+      if (image) {
+        user.profileImage = image;
+      }
+
+      // 수정할 부분이 없을 경우 / 수정할 내용이 있다면 해당 부분만 수정
+      if (!(nickName || image)) {
+        return res
+          .status(412)
+          .json({ errorMessage: "수정할 내용이 없습니다." });
+      }
+
+      // update
+      const updateCount = await user.save();
+
+      // 수정 검사
+      if (updateCount < 1) {
+        return res.status(404).json({
+          errorMessage: "mypage 수정이 정상적으로 수정되지 않았습니다.",
+        });
+      }
+
+      // 수정 완료
+      return res.status(200).json({ message: "mypage 수정 완료." });
+    } catch (e) {
+      console.log(e);
       return res
-        .status(412)
-        .json({ errorMessage: "유효하지 않은 nickName입니다." });
+        .status(400)
+        .json({ errorMessage: "mypage 수정 실패. 요청이 올바르지 않습니다." });
     }
-
-    // 수정할 내용에 따라 수정
-    if (user.nickName !== nickName) {
-      user.nickName = nickName;
-    }
-
-    // 수정할 부분이 없을 경우 / 수정할 내용이 있다면 해당 부분만 수정
-    if (!nickName) {
-      return res.status(412).json({ errorMessage: "수정할 내용이 없습니다." });
-    }
-
-    // update
-    const updateCount = await user.save();
-
-    // 수정 검사
-    if (updateCount < 1) {
-      return res.status(404).json({
-        errorMessage: "mypage 수정이 정상적으로 수정되지 않았습니다.",
-      });
-    }
-
-    // 수정 완료
-    return res.status(200).json({ message: "mypage 수정 완료." });
-  } catch (e) {
-    console.log(e);
-    return res
-      .status(400)
-      .json({ errorMessage: "mypage 수정 실패. 요청이 올바르지 않습니다." });
   }
-});
+);
 
 module.exports = router;
