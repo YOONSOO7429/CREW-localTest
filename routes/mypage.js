@@ -1,37 +1,37 @@
 const express = require("express");
 const router = express.Router();
-const multer = require("multer");
-const multerS3 = require("multer-s3");
-const AWS = require("aws-sdk");
+// const multer = require("multer");
+// const multerS3 = require("multer-s3");
+// const AWS = require("aws-sdk");
 const authJwt = require("../middlewares/authMiddleware");
 const { Users, Boats, Crews } = require("../models");
 
 // s3 설정
-require("dotenv").config();
+// require("dotenv").config();
 
-AWS.config.update({
-  region: process.env.AWS_REGION,
-  accessKeyId: process.env.AWS_ACCESS_KEY_ID,
-  secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
-});
+// AWS.config.update({
+//   region: process.env.AWS_REGION,
+//   accessKeyId: process.env.AWS_ACCESS_KEY_ID,
+//   secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
+// });
 
-const s3 = new AWS.S3();
+// const s3 = new AWS.S3();
 
 // multer 설정
-const upload = multer({
-  storage: multerS3({
-    s3: s3,
-    contentType: multerS3.AUTO_CONTENT_TYPE,
-    acl: "public-read",
-    bucket: process.env.AWS_BUCKET,
-    key: (req, file, callback) => {
-      const fileName = Date.now().toString() + file.originalname;
-      callback(null, fileName);
-    },
-    // 용량 제한
-    limits: { fileSize: 5 * 1024 * 1024 },
-  }),
-});
+// const upload = multer({
+//   storage: multerS3({
+//     s3: s3,
+//     contentType: multerS3.AUTO_CONTENT_TYPE,
+//     acl: "public-read",
+//     bucket: process.env.AWS_BUCKET,
+//     key: (req, file, callback) => {
+//       const fileName = Date.now().toString() + file.originalname;
+//       callback(null, fileName);
+//     },
+//     // 용량 제한
+//     limits: { fileSize: 5 * 1024 * 1024 },
+//   }),
+// });
 
 /* mypage API
 토큰을 검사하여 userId에 맞게 모집 글, 참여 글 불러오기 */
@@ -98,7 +98,7 @@ router.get("/mypage", authJwt, async (req, res) => {
 /* mypage 수정 이미지와 닉네임 수정*/
 router.put(
   "/mypage/edit",
-  upload.single("image"),
+  // upload.single("image"),
   authJwt,
   async (req, res) => {
     try {
@@ -108,7 +108,7 @@ router.put(
 
       // body로 정보 입력
       const { nickName } = req.body;
-      const image = req.file;
+      // const image = req.file;
 
       // 수정 검사
       if (nickName < 1) {
@@ -116,22 +116,22 @@ router.put(
           .status(412)
           .json({ errorMessage: "유효하지 않은 nickName입니다." });
       }
-      if (image === "") {
-        return res
-          .status(412)
-          .json({ errorMessage: "유효하지 않은 image입니다." });
-      }
+      // if (image === "") {
+      //   return res
+      //     .status(412)
+      //     .json({ errorMessage: "유효하지 않은 image입니다." });
+      // }
 
       // 수정할 내용에 따라 수정
       if (user.nickName !== nickName) {
         user.nickName = nickName;
       }
-      if (image) {
-        user.profileImage = image.location;
-      }
+      // if (user.profileImage !== image.location) {
+      //   user.profileImage = image.location;
+      // }
 
       // 수정할 부분이 없을 경우 / 수정할 내용이 있다면 해당 부분만 수정
-      if (!(nickName || image)) {
+      if (!nickName) {
         return res
           .status(412)
           .json({ errorMessage: "수정할 내용이 없습니다." });
