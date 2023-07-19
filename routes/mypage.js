@@ -111,7 +111,7 @@ router.get("/mypage", authJwt, async (req, res) => {
 });
 
 /* mypage 수정 이미지와 닉네임 수정*/
-router.put(
+router.post(
   "/mypage/edit",
   upload.single("image"),
   authJwt,
