@@ -125,7 +125,7 @@ router.post(
       const existingProfileImage = user.profileImage;
 
       // body로 정보 입력
-      const { nickName } = req.body;
+      const { nickName, myMessage } = req.body;
       const image = req.file;
 
       // 수정 검사
@@ -133,6 +133,11 @@ router.post(
         return res
           .status(412)
           .json({ errorMessage: "유효하지 않은 nickName입니다." });
+      }
+      if (myMessage < 1) {
+        return res
+          .status(412)
+          .json({ errorMessage: "유효하지 않은 myMessage입니다." });
       }
       if (image === "") {
         return res
@@ -143,6 +148,9 @@ router.post(
       // 수정할 내용에 따라 수정
       if (nickName) {
         user.nickName = nickName;
+      }
+      if (myMessage) {
+        user.myMessage = myMessage;
       }
       if (user.profileImage !== image.location) {
         // 기존 이미지를 S3에서 삭제 (기존 이미지가 있을 경우)
