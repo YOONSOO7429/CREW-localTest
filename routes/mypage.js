@@ -125,7 +125,7 @@ router.put(
       const existingProfileImage = user.profileImage;
 
       // body로 정보 입력
-      // const { nickName } = req.body;
+      const { nickName } = req.body;
       const image = req.file;
 
       // 수정 검사
