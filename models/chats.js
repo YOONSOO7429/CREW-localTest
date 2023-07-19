@@ -15,9 +15,9 @@ module.exports = (sequelize, DataTypes) => {
         onDelete: "CASCADE",
       });
 
-      this.belongsTo(models.Rooms, {
-        targetKey: "roomId",
-        foreignKey: "roomId",
+      this.belongsTo(models.Boats, {
+        targetKey: "boatId",
+        foreignKey: "boatId",
         onDelete: "CASCADE",
       });
     }
@@ -30,23 +30,13 @@ module.exports = (sequelize, DataTypes) => {
         primaryKey: true,
         type: DataTypes.INTEGER,
       },
-      userId: {
+      boatId: {
         allowNull: false,
         type: DataTypes.INTEGER,
         references: {
-          model: "Users",
-          key: "userId",
+          model: "Boats",
+          key: "boatId",
         },
-        onDelete: "CASCADE",
-      },
-      roomId: {
-        allowNull: false,
-        type: DataTypes.INTEGER,
-        references: {
-          model: "Rooms",
-          key: "roomId",
-        },
-        onDelete: "CASCADE",
       },
       chatMessage: {
         type: DataTypes.TEXT,

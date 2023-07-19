@@ -9,23 +9,13 @@ module.exports = {
         primaryKey: true,
         type: Sequelize.INTEGER,
       },
-      userId: {
+      boatId: {
         allowNull: false,
         type: Sequelize.INTEGER,
         references: {
-          model: "Users",
-          key: "userId",
+          model: "Boats",
+          key: "boatId",
         },
-        onDelete: "CASCADE",
-      },
-      roomId: {
-        allowNull: false,
-        type: Sequelize.INTEGER,
-        references: {
-          model: "Rooms",
-          key: "roomId",
-        },
-        onDelete: "CASCADE",
       },
       chatMessage: {
         type: Sequelize.TEXT,
