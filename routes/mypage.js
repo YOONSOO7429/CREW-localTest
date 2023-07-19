@@ -141,7 +141,7 @@ router.put(
       }
 
       // 수정할 내용에 따라 수정
-      if (user.nickName !== nickName) {
+      if (nickName) {
         user.nickName = nickName;
       }
       if (user.profileImage !== image.location) {
