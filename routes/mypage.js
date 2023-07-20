@@ -130,7 +130,12 @@ router.post(
       const { nickName, myMessage } = req.body;
 
       const image = req.file;
-      const profileImage = image.location;
+      if (image === null) {
+        const profileImage = null;
+      }
+      if (image) {
+        const profileImage = image.location;
+      }
 
       // 수정 검사
       if (nickName < 1) {
@@ -156,15 +161,10 @@ router.post(
       if (user.myMessage !== myMessage) {
         user.myMessage = myMessage;
       }
-      if (image) {
-        if (user.profileImage !== profileImage) {
-          // 기존 이미지를 S3에서 삭제 (기존 이미지가 있을 경우)
-          deleteOldImage(existingProfileImage);
-          user.profileImage = profileImage;
-        }
-      }
-      if (image === null) {
-        user.profileImage = null;
+      if (user.profileImage !== profileImage) {
+        // 기존 이미지를 S3에서 삭제 (기존 이미지가 있을 경우)
+        deleteOldImage(existingProfileImage);
+        user.profileImage = profileImage;
       }
 
       // 수정할 부분이 없을 경우 / 수정할 내용이 있다면 해당 부분만 수정
