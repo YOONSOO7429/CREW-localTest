@@ -1,8 +1,10 @@
 const express = require("express");
 const router = express.Router();
+const { v4: uuid } = require("uuid");
 const multer = require("multer");
 const multerS3 = require("multer-s3");
 const AWS = require("aws-sdk");
+const path = require("path");
 const authJwt = require("../middlewares/authMiddleware");
 const { Users, Boats, Crews } = require("../models");
 
@@ -25,8 +27,8 @@ const upload = multer({
     acl: "public-read",
     bucket: process.env.AWS_BUCKET,
     key: (req, file, callback) => {
-      const fileName = Date.now().toString() + file.originalname;
-      callback(null, fileName);
+      const ext = path.extname(file.originalname);
+      callback(null, Date.now().toString() + uuid() + ext);
     },
     // 용량 제한
     limits: { fileSize: 5 * 1024 * 1024 },
