@@ -110,80 +110,85 @@ router.get("/mypage", authJwt, async (req, res) => {
   }
 });
 
-/* mypage 수정 이미지와 닉네임 수정*/
-router.post(
-  "/mypage/edit",
-  upload.single("image"),
-  authJwt,
-  async (req, res) => {
-    try {
-      // user 정보
-      const { userId } = res.locals.user;
-      const user = await Users.findOne({ where: userId });
-
-      // 사용자 객체에서 기존 프로필 이미지 URL 가져오기
-      const existingProfileImage = user.profileImage;
-
-      // body로 정보 입력
-      const { nickName, myMessage } = req.body;
-      const image = req.file;
-
-      // 수정 검사
-      if (nickName < 1) {
-        return res
-          .status(412)
-          .json({ errorMessage: "유효하지 않은 nickName입니다." });
-      }
-      if (myMessage < 1) {
-        return res
-          .status(412)
-          .json({ errorMessage: "유효하지 않은 myMessage입니다." });
-      }
-      if (image === "") {
-        return res
-          .status(412)
-          .json({ errorMessage: "유효하지 않은 image입니다." });
-      }
-
-      // 수정할 내용에 따라 수정
-      if (nickName) {
-        user.nickName = nickName;
-      }
-      if (myMessage) {
-        user.myMessage = myMessage;
-      }
-      if (user.profileImage !== image.location) {
-        // 기존 이미지를 S3에서 삭제 (기존 이미지가 있을 경우)
-        deleteOldImage(existingProfileImage);
-        user.profileImage = image.location;
-      }
-
-      // 수정할 부분이 없을 경우 / 수정할 내용이 있다면 해당 부분만 수정
-      if (!image) {
-        return res
-          .status(412)
-          .json({ errorMessage: "수정할 내용이 없습니다." });
-      }
-
-      // update
-      const updateCount = await user.save();
-
-      // 수정 검사
-      if (updateCount < 1) {
-        return res.status(404).json({
-          errorMessage: "mypage 수정이 정상적으로 수정되지 않았습니다.",
-        });
-      }
-
-      // 수정 완료
-      return res.status(200).json({ message: "mypage 수정 완료." });
-    } catch (e) {
-      console.log(e);
-      return res
-        .status(400)
-        .json({ errorMessage: "mypage 수정 실패. 요청이 올바르지 않습니다." });
-    }
+/* 이미지 파일 업로드 API */
+router.post("/mypage/upload", upload.single("image"), async (req, res) => {
+  try {
+    const image = req.file.location;
+    return res.status(200).json({ image });
+  } catch (e) {
+    console.log(e);
+    return res.status(400).json({
+      errorMessage: "이미지 업로드 실패. 요청이 올바르지 않습니다.",
+    });
   }
-);
+});
+
+/* mypage 수정 이미지와 닉네임 수정*/
+router.post("/mypage/edit", authJwt, async (req, res) => {
+  try {
+    // user 정보
+    const { userId } = res.locals.user;
+    const user = await Users.findOne({ where: userId });
+
+    // 사용자 객체에서 기존 프로필 이미지 URL 가져오기
+    const existingProfileImage = user.profileImage;
+
+    // body로 정보 입력
+    const { nickName, profileImage, myMessage } = req.body;
+
+    // 수정 검사
+    if (nickName < 1) {
+      return res
+        .status(412)
+        .json({ errorMessage: "유효하지 않은 nickName입니다." });
+    }
+    if (myMessage < 1) {
+      return res
+        .status(412)
+        .json({ errorMessage: "유효하지 않은 myMessage입니다." });
+    }
+    if (profileImage === "") {
+      return res
+        .status(412)
+        .json({ errorMessage: "유효하지 않은 image입니다." });
+    }
+
+    // 수정할 내용에 따라 수정
+    if (nickName) {
+      user.nickName = nickName;
+    }
+    if (myMessage) {
+      user.myMessage = myMessage;
+    }
+    if (user.profileImage !== profileImage) {
+      // 기존 이미지를 S3에서 삭제 (기존 이미지가 있을 경우)
+      deleteOldImage(existingProfileImage);
+      user.profileImage = profileImage;
+    }
+
+    // 수정할 부분이 없을 경우 / 수정할 내용이 있다면 해당 부분만 수정
+    if (!profileImage) {
+      return res.status(412).json({ errorMessage: "수정할 내용이 없습니다." });
+    }
+
+    // update
+    const updateCount = await user.save();
+
+    // 수정 검사
+    if (updateCount < 1) {
+      return res.status(404).json({
+        errorMessage: "mypage 수정이 정상적으로 수정되지 않았습니다.",
+      });
+    }
+
+    // 수정 완료
+    return res.status(200).json({ message: "mypage 수정 완료." });
+  } catch (e) {
+    console.log(e);
+    return res
+      .status(400)
+      .json({ errorMessage: "mypage 수정 실패. 요청이 올바르지 않습니다." });
+  }
+});
 
 module.exports = router;
