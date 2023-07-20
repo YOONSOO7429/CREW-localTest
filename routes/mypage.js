@@ -128,6 +128,8 @@ router.post(
       const { nickName, myMessage } = req.body;
 
       const image = req.file;
+      console.log(typeof image);
+      console.log(image);
 
       // 수정 검사
       if (nickName < 1) {

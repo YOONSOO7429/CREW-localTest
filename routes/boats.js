@@ -116,7 +116,25 @@ router.get("/boat/map", async (req, res) => {
     let swLongitude = data.Bounds.swLatLng[1];
     let neLatitude = data.Bounds.neLatLng[0];
     let neLongitude = data.Bounds.neLatLng[1];
+    // let level = data.Bounds.level;
 
+    // const clusterHandler = async () => {
+    //   const boats = await Boats.findAll({
+    //     attributes: ["latitude", "longitude"],
+    //     where: {
+    //       isDone: false,
+    //       deletedAt: null,
+    //       latitude: { [Op.between]: [swLatitude, neLatitude] },
+    //       longitude: { [Op.between]: [swLongitude, neLongitude] },
+    //     },
+    //     raw: true,
+    //   });
+    //   return boats;
+    // };
+
+    // if (0 < level < 3) {
+    //   const boats = await clusterHandler();
+    // }
     // Crew 모집 글 목록 조회
     const boats = await Boats.findAll({
       attributes: [
