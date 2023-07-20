@@ -130,110 +130,58 @@ router.post(
       const { nickName, myMessage } = req.body;
 
       const image = req.file;
-      if (image === null) {
-        const profileImage = null;
-        // 수정 검사
-        if (nickName < 1) {
-          return res
-            .status(412)
-            .json({ errorMessage: "유효하지 않은 nickName입니다." });
-        }
-        if (myMessage < 1) {
-          return res
-            .status(412)
-            .json({ errorMessage: "유효하지 않은 myMessage입니다." });
-        }
-        if (image < 1) {
-          return res
-            .status(412)
-            .json({ errorMessage: "유효하지 않은 image입니다." });
-        }
+      console.log(image);
 
-        // 수정할 내용에 따라 수정
-        if (nickName) {
-          user.nickName = nickName;
-        }
-        if (user.myMessage !== myMessage) {
-          user.myMessage = myMessage;
-        }
-        if (user.profileImage !== profileImage) {
-          // 기존 이미지를 S3에서 삭제 (기존 이미지가 있을 경우)
-          deleteOldImage(existingProfileImage);
-          user.profileImage = profileImage;
-        }
+      // 수정 검사
+      if (nickName < 1) {
+        return res
+          .status(412)
+          .json({ errorMessage: "유효하지 않은 nickName입니다." });
+      }
+      if (myMessage < 1) {
+        return res
+          .status(412)
+          .json({ errorMessage: "유효하지 않은 myMessage입니다." });
+      }
+      if (image < 1) {
+        return res
+          .status(412)
+          .json({ errorMessage: "유효하지 않은 image입니다." });
+      }
 
-        // 수정할 부분이 없을 경우 / 수정할 내용이 있다면 해당 부분만 수정
-        if (!(image || nickName || myMessage)) {
-          return res
-            .status(412)
-            .json({ errorMessage: "수정할 내용이 없습니다." });
-        }
-
-        // update
-        const updateCount = await user.save();
-
-        // 수정 검사
-        if (updateCount < 1) {
-          return res.status(404).json({
-            errorMessage: "mypage 수정이 정상적으로 수정되지 않았습니다.",
-          });
-        }
-
-        // 수정 완료
-        return res.status(200).json({ message: "mypage 수정 완료." });
+      // 수정할 내용에 따라 수정
+      if (nickName) {
+        user.nickName = nickName;
+      }
+      if (user.myMessage !== myMessage) {
+        user.myMessage = myMessage;
       }
       if (image) {
         const profileImage = image.location;
-        // 수정 검사
-        if (nickName < 1) {
-          return res
-            .status(412)
-            .json({ errorMessage: "유효하지 않은 nickName입니다." });
-        }
-        if (myMessage < 1) {
-          return res
-            .status(412)
-            .json({ errorMessage: "유효하지 않은 myMessage입니다." });
-        }
-        if (image < 1) {
-          return res
-            .status(412)
-            .json({ errorMessage: "유효하지 않은 image입니다." });
-        }
-
-        // 수정할 내용에 따라 수정
-        if (nickName) {
-          user.nickName = nickName;
-        }
-        if (user.myMessage !== myMessage) {
-          user.myMessage = myMessage;
-        }
-        if (user.profileImage !== profileImage) {
-          // 기존 이미지를 S3에서 삭제 (기존 이미지가 있을 경우)
-          deleteOldImage(existingProfileImage);
-          user.profileImage = profileImage;
-        }
-
-        // 수정할 부분이 없을 경우 / 수정할 내용이 있다면 해당 부분만 수정
-        if (!(image || nickName || myMessage)) {
-          return res
-            .status(412)
-            .json({ errorMessage: "수정할 내용이 없습니다." });
-        }
-
-        // update
-        const updateCount = await user.save();
-
-        // 수정 검사
-        if (updateCount < 1) {
-          return res.status(404).json({
-            errorMessage: "mypage 수정이 정상적으로 수정되지 않았습니다.",
-          });
-        }
-
-        // 수정 완료
-        return res.status(200).json({ message: "mypage 수정 완료." });
+        // 기존 이미지를 S3에서 삭제 (기존 이미지가 있을 경우)
+        deleteOldImage(existingProfileImage);
+        user.profileImage = profileImage;
       }
+
+      // 수정할 부분이 없을 경우 / 수정할 내용이 있다면 해당 부분만 수정
+      if (!(image || nickName || myMessage)) {
+        return res
+          .status(412)
+          .json({ errorMessage: "수정할 내용이 없습니다." });
+      }
+
+      // update
+      const updateCount = await user.save();
+
+      // 수정 검사
+      if (updateCount < 1) {
+        return res.status(404).json({
+          errorMessage: "mypage 수정이 정상적으로 수정되지 않았습니다.",
+        });
+      }
+
+      // 수정 완료
+      return res.status(200).json({ message: "mypage 수정 완료." });
     } catch (e) {
       console.log(e);
       return res
