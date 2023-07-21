@@ -117,41 +117,70 @@ router.get("/boat/map", async (req, res) => {
     let swLongitude = data.Bounds.swLatLng[1];
     let neLatitude = data.Bounds.neLatLng[0];
     let neLongitude = data.Bounds.neLatLng[1];
+    let level = data.Bounds.level;
 
-    // Crew 모집 글 목록 조회
-    const boats = await Boats.findAll({
-      attributes: [
-        "boatId",
-        "title",
-        "keyword",
-        "endDate",
-        "maxCrewNum",
-        [
-          sequelize.literal(
-            `(SELECT COUNT(*) FROM Crews WHERE Boats.boatId = Crews.boatId AND Crews.isReleased = false) + 1`
-          ),
-          "crewNum",
-        ],
-        "address",
-        "latitude",
-        "longitude",
-      ],
-      where: {
-        isDone: false,
-        deletedAt: null,
-        latitude: { [Op.between]: [swLatitude, neLatitude] },
-        longitude: { [Op.between]: [swLongitude, neLongitude] },
-      },
-      group: ["Boats.boatId"],
-      raw: true,
-    });
+    // 클러스터링을 위한 위도와 경도 조회
+    const clusterHandler = async () => {
+      const boats = await Boats.findAll({
+        attributes: ["latitude", "longitude"],
+        where: {
+          isDone: false,
+          deletedAt: null,
+          latitude: { [Op.between]: [swLatitude, neLatitude] },
+          longitude: { [Op.between]: [swLongitude, neLongitude] },
+        },
+        raw: true,
+      });
+      return boats;
+    };
 
-    // 작성된 모집 글이 없을 경우
-    if (!boats) {
-      return res.status(202).json({ boats: [] });
+    // level => 1, 2
+    if (8 < level < 15) {
+      const boats = await clusterHandler();
+      if (!boats) {
+        return res.status(202).json({ boats: [] });
+      }
+
+      return res.status(200).json({ boats });
     }
 
-    return res.status(200).json({ boats });
+    // (클러스터링 적용 X) level => 1~8
+    if (0 < level < 9) {
+      // Crew 모집 글 목록 조회
+      const boats = await Boats.findAll({
+        attributes: [
+          "boatId",
+          "title",
+          "keyword",
+          "endDate",
+          "maxCrewNum",
+          [
+            sequelize.literal(
+              `(SELECT COUNT(*) FROM Crews WHERE Boats.boatId = Crews.boatId AND Crews.isReleased = false) + 1`
+            ),
+            "crewNum",
+          ],
+          "address",
+          "latitude",
+          "longitude",
+        ],
+        where: {
+          isDone: false,
+          deletedAt: null,
+          latitude: { [Op.between]: [swLatitude, neLatitude] },
+          longitude: { [Op.between]: [swLongitude, neLongitude] },
+        },
+        group: ["Boats.boatId"],
+        raw: true,
+      });
+
+      // 작성된 모집 글이 없을 경우
+      if (!boats) {
+        return res.status(202).json({ boats: [] });
+      }
+
+      return res.status(200).json({ boats });
+    }
   } catch (e) {
     console.log(e);
     return res
