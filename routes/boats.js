@@ -164,6 +164,10 @@ router.get("/boat/map", async (req, res) => {
     if (0 < level < 3) {
       const data = await clusterHandler();
       const boats = boatCount(data, 1);
+      if (!boats) {
+        return res.status(202).json({ boats: [] });
+      }
+
       return res.status(200).json({ boats });
     }
 
@@ -171,6 +175,10 @@ router.get("/boat/map", async (req, res) => {
     if (2 < level < 5) {
       const data = await clusterHandler();
       const boats = boatCount(data, 2);
+      if (!boats) {
+        return res.status(202).json({ boats: [] });
+      }
+
       return res.status(200).json({ boats });
     }
 
@@ -178,6 +186,10 @@ router.get("/boat/map", async (req, res) => {
     if (4 < level < 7) {
       const data = await clusterHandler();
       const boats = boatCount(data, 3);
+      if (!boats) {
+        return res.status(202).json({ boats: [] });
+      }
+
       return res.status(200).json({ boats });
     }
 
@@ -185,6 +197,10 @@ router.get("/boat/map", async (req, res) => {
     if (6 < level < 9) {
       const data = await clusterHandler();
       const boats = boatCount(data, 4);
+      if (!boats) {
+        return res.status(202).json({ boats: [] });
+      }
+
       return res.status(200).json({ boats });
     }
 
@@ -192,6 +208,10 @@ router.get("/boat/map", async (req, res) => {
     if (8 < level < 11) {
       const data = await clusterHandler();
       const boats = boatCount(data, 5);
+      if (!boats) {
+        return res.status(202).json({ boats: [] });
+      }
+
       return res.status(200).json({ boats });
     }
 
