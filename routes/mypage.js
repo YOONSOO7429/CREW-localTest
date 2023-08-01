@@ -180,7 +180,11 @@ router.post(
       }
 
       // 수정 완료
-      return res.status(200).json({ message: "mypage 수정 완료." });
+      if (updateCount) {
+        await Boats.update({ captain: nickName }, { where: { userId } });
+        await Crews.update({ nickName: nickName }, { where: { userId } });
+        return res.status(200).json({ message: "mypage 수정 완료." });
+      }
     } catch (e) {
       console.log(e);
       return res
